@@ -7,7 +7,7 @@ on:
     branches: [ develop, main ]
 
 env:
-  NODE_VERSION: '18.x'
+  NODE_VERSION: '20.x'
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
 jobs:
@@ -41,12 +41,9 @@ jobs:
             **/package.json
       
       - name: Install Root Dependencies
-        run: |
-          npm install --legacy-peer-deps
-          npm install --legacy-peer-deps --prefix frontend
+        run: npm install --legacy-peer-deps
       
       - name: Run Tests
-        working-directory: frontend
         run: npm test -- --passWithNoTests
 
   build:
@@ -66,19 +63,16 @@ jobs:
             **/package.json
       
       - name: Install Root Dependencies
-        run: |
-          npm install --legacy-peer-deps
-          npm install --legacy-peer-deps --prefix frontend
+        run: npm install --legacy-peer-deps
       
       - name: Build Frontend
-        working-directory: frontend
         run: npm run build
       
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
           name: frontend-build
-          path: frontend/build
+          path: build
 
   deploy-dev:
     name: Deploy to Development
@@ -93,13 +87,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: frontend-build
-          path: frontend/build
+          path: build
       
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: frontend/build
+          publish_dir: build
           destination_dir: dev
 
   deploy-homolog:
@@ -115,13 +109,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: frontend-build
-          path: frontend/build
+          path: build
       
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: frontend/build
+          publish_dir: build
           destination_dir: homolog
 
   deploy-prod:
@@ -137,11 +131,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: frontend-build
-          path: frontend/build
+          path: build
       
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: frontend/build
+          publish_dir: build
           destination_dir: prod 
