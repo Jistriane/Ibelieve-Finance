@@ -1,12 +1,10 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import { render } from '@testing-library/react';
 import App from './App';
 
 describe('App', () => {
-  test('renders learn react link', () => {
-    render(<App />);
-    const linkElement = screen.getByText(/learn react/i);
-    expect(linkElement).toBeInTheDocument();
+  it('renders without crashing', () => {
+    const { container } = render(<App />);
+    expect(container.querySelector('main')).toBeInTheDocument();
   });
 });
