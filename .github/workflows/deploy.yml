@@ -16,15 +16,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Run SAST
-        uses: github/codeql-action/analyze@v2
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
         with:
           languages: javascript
 
-      - name: Run Dependency Check
-        uses: snyk/actions/node@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
 
   test:
     name: Test
