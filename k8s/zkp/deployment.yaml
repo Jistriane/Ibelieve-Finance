@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zkp
+  labels:
+    app: zkp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: zkp
+  template:
+    metadata:
+      labels:
+        app: zkp
+    spec:
+      containers:
+        - name: zkp
+          image: ibelieve/zkp:latest
+          ports:
+            - containerPort: 4000
+          envFrom:
+            - secretRef:
+                name: zkp-secrets
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 4000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /live
+              port: 4000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "2"
+              memory: "2Gi" 

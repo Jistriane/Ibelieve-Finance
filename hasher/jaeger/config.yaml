@@ -1,0 +1,28 @@
+sampling:
+  default:
+    type: probabilistic
+    param: 1.0
+
+storage:
+  type: elasticsearch
+  options:
+    es:
+      server-urls: ${ELASTICSEARCH_URL}
+      username: ${ELASTICSEARCH_USER}
+      password: ${ELASTICSEARCH_PASSWORD}
+      index-prefix: jaeger
+      max-span-age: 168h
+
+ingester:
+  deadlockInterval: 5s
+
+query:
+  base-path: /jaeger
+
+agent:
+  http-server:
+    host-port: :5778
+  grpc-server:
+    host-port: :6831
+  zipkin:
+    host-port: :5775 

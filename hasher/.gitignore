@@ -1,0 +1,105 @@
+# Dependências
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Ambiente
+.env
+.env.local
+.env.*.local
+.env-dev
+.env-homolog
+.env-prod
+
+# Build
+dist/
+build/
+*.tsbuildinfo
+
+# Testes
+coverage/
+.nyc_output/
+
+# Logs
+logs/
+*.log
+
+# IDEs e editores
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Arquivos temporários
+tmp/
+temp/
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# Arquivos de ambiente
+.env*
+!.env.example
+
+# Arquivos de build
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# Arquivos de IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Arquivos de log
+*.log
+logs/
+
+# Arquivos de banco de dados
+*.db
+*.sqlite
+
+# Arquivos de cache
+.cache/
+.rustc_info.json
+
+# Arquivos de dependências
+vendor/
+
+# Arquivos de modelo
+models/
+*.model
+*.bin
+
+# Arquivos de chaves
+keys/
+*.key
+*.pem
+
+# Arquivos de teste
+coverage/
+.coverage
+htmlcov/
+
+# Arquivos de documentação
+docs/_build/
+site/
+
+# Arquivos de deploy
+dist/
+build/
+*.tar.gz
+*.zip
+
+# Arquivos de backup
+*.bak
+*.backup
+*~
+
+# Arquivos de configuração local
+config.local.*
+settings.local.*
