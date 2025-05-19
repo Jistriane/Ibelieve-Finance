@@ -8,8 +8,6 @@ on:
 
 env:
   NODE_VERSION: '18.x'
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   security-scan:
@@ -42,10 +40,14 @@ jobs:
           cache: 'npm'
 
       - name: Install Dependencies
-        run: npm ci
+        run: |
+          cd frontend
+          npm ci
 
       - name: Run Tests
-        run: npm test
+        run: |
+          cd frontend
+          npm test
 
   build:
     name: Build
@@ -61,16 +63,20 @@ jobs:
           cache: 'npm'
 
       - name: Install Dependencies
-        run: npm ci
+        run: |
+          cd frontend
+          npm ci
         
       - name: Build
-        run: npm run build
+        run: |
+          cd frontend
+          npm run build
         
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
           name: build
-          path: dist/
+          path: frontend/build/
 
   deploy-dev:
     name: Deploy to Development
@@ -85,14 +91,15 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build
-          path: dist
+          path: build
           
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          publish_dir: ./build
           publish_branch: gh-pages-dev
+          destination_dir: dev
 
   deploy-homolog:
     name: Deploy to Homologation
@@ -107,14 +114,15 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build
-          path: dist
+          path: build
           
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          publish_dir: ./build
           publish_branch: gh-pages-homolog
+          destination_dir: homolog
 
   deploy-prod:
     name: Deploy to Production
@@ -129,11 +137,11 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build
-          path: dist
+          path: build
           
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          publish_dir: ./build
           publish_branch: gh-pages 
