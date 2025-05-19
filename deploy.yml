@@ -8,8 +8,6 @@ on:
 
 env:
   NODE_VERSION: '18.x'
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   security-scan:
@@ -54,24 +52,23 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-        
-      - name: Login to Container Registry
-        uses: docker/login-action@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
           
-      - name: Build and Push Docker Image
-        uses: docker/build-push-action@v4
+      - name: Install Dependencies
+        run: npm ci
+        
+      - name: Build
+        run: npm run build
+        
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
         with:
-          context: .
-          push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          name: build
+          path: dist/
 
   deploy-dev:
     name: Deploy to Development
@@ -80,10 +77,20 @@ jobs:
     environment: development
     if: github.ref == 'refs/heads/develop'
     steps:
-      - name: Deploy to Development
-        run: |
-          echo "Deploying to development environment"
-          # Adicione aqui os comandos específicos para deploy em dev
+      - uses: actions/checkout@v3
+      
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+          path: dist
+          
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: gh-pages-dev
 
   deploy-homolog:
     name: Deploy to Homologation
@@ -92,10 +99,20 @@ jobs:
     environment: homologation
     if: github.ref == 'refs/heads/main'
     steps:
-      - name: Deploy to Homologation
-        run: |
-          echo "Deploying to homologation environment"
-          # Adicione aqui os comandos específicos para deploy em homolog
+      - uses: actions/checkout@v3
+      
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+          path: dist
+          
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: gh-pages-homolog
 
   deploy-prod:
     name: Deploy to Production
@@ -104,7 +121,17 @@ jobs:
     environment: production
     if: github.ref == 'refs/heads/main'
     steps:
-      - name: Deploy to Production
-        run: |
-          echo "Deploying to production environment"
-          # Adicione aqui os comandos específicos para deploy em prod 
+      - uses: actions/checkout@v3
+      
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+          path: dist
+          
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: gh-pages 
