@@ -40,7 +40,7 @@ jobs:
             **/package-lock.json
             **/package.json
       
-      - name: Install Root Dependencies
+      - name: Install Dependencies
         run: npm install --legacy-peer-deps
       
       - name: Run Tests
@@ -62,17 +62,21 @@ jobs:
             **/package-lock.json
             **/package.json
       
-      - name: Install Root Dependencies
+      - name: Install Dependencies
         run: npm install --legacy-peer-deps
       
-      - name: Build Frontend
+      - name: Build
         run: npm run build
+      
+      - name: List Build Directory
+        run: ls -la build/
       
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: frontend-build
-          path: build
+          name: build-artifact
+          path: build/
+          retention-days: 1
 
   deploy-dev:
     name: Deploy to Development
@@ -86,8 +90,11 @@ jobs:
       - name: Download Build Artifact
         uses: actions/download-artifact@v4
         with:
-          name: frontend-build
+          name: build-artifact
           path: build
+      
+      - name: List Downloaded Files
+        run: ls -la build/
       
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
@@ -108,8 +115,11 @@ jobs:
       - name: Download Build Artifact
         uses: actions/download-artifact@v4
         with:
-          name: frontend-build
+          name: build-artifact
           path: build
+      
+      - name: List Downloaded Files
+        run: ls -la build/
       
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
@@ -130,8 +140,11 @@ jobs:
       - name: Download Build Artifact
         uses: actions/download-artifact@v4
         with:
-          name: frontend-build
+          name: build-artifact
           path: build
+      
+      - name: List Downloaded Files
+        run: ls -la build/
       
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
