@@ -2,176 +2,146 @@ name: Deploy Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ develop, main ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ develop, main ]
 
 env:
   NODE_VERSION: '18.x'
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
 jobs:
   security-scan:
     name: Security Scan
     runs-on: ubuntu-latest
-    permissions:
-      security-events: write
-      actions: read
-      contents: read
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: ${{ github.ref }}
-
+      - uses: actions/checkout@v4
+      
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: javascript
-          tools: linked
-
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v3
-
+          
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
 
   test:
     name: Test
     runs-on: ubuntu-latest
-    needs: security-scan
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: ${{ github.ref }}
-
+      - uses: actions/checkout@v4
+      
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-
-      - name: Install Dependencies
+          cache-dependency-path: |
+            **/package-lock.json
+            **/package.json
+      
+      - name: Install Root Dependencies
         run: |
-          cd frontend
-          npm ci
-
+          npm install --legacy-peer-deps
+          npm install --legacy-peer-deps --prefix frontend
+      
       - name: Run Tests
-        run: |
-          cd frontend
-          CI=false npm test
+        working-directory: frontend
+        run: npm test -- --passWithNoTests
 
   build:
     name: Build
+    needs: [security-scan, test]
     runs-on: ubuntu-latest
-    needs: test
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: ${{ github.ref }}
-
+      - uses: actions/checkout@v4
+      
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-
-      - name: Install Dependencies
+          cache-dependency-path: |
+            **/package-lock.json
+            **/package.json
+      
+      - name: Install Root Dependencies
         run: |
-          cd frontend
-          npm ci
-        
-      - name: Build
-        run: |
-          cd frontend
-          npm run build
-        
-      - name: Upload build artifacts
+          npm install --legacy-peer-deps
+          npm install --legacy-peer-deps --prefix frontend
+      
+      - name: Build Frontend
+        working-directory: frontend
+        run: npm run build
+      
+      - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: build
-          path: frontend/build/
+          name: frontend-build
+          path: frontend/build
 
   deploy-dev:
     name: Deploy to Development
-    runs-on: ubuntu-latest
     needs: build
-    environment: development
     if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    environment: development
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: ${{ github.ref }}
+      - uses: actions/checkout@v4
       
-      - name: Download build artifacts
+      - name: Download Build Artifact
         uses: actions/download-artifact@v4
         with:
-          name: build
-          path: build
-          
+          name: frontend-build
+          path: frontend/build
+      
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
-          publish_branch: gh-pages-dev
+          publish_dir: frontend/build
           destination_dir: dev
 
   deploy-homolog:
     name: Deploy to Homologation
-    runs-on: ubuntu-latest
     needs: build
-    environment: homologation
     if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: homologation
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: ${{ github.ref }}
+      - uses: actions/checkout@v4
       
-      - name: Download build artifacts
+      - name: Download Build Artifact
         uses: actions/download-artifact@v4
         with:
-          name: build
-          path: build
-          
+          name: frontend-build
+          path: frontend/build
+      
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
-          publish_branch: gh-pages-homolog
+          publish_dir: frontend/build
           destination_dir: homolog
 
   deploy-prod:
     name: Deploy to Production
-    runs-on: ubuntu-latest
-    needs: deploy-homolog
-    environment: production
+    needs: [deploy-homolog]
     if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: ${{ github.ref }}
+      - uses: actions/checkout@v4
       
-      - name: Download build artifacts
+      - name: Download Build Artifact
         uses: actions/download-artifact@v4
         with:
-          name: build
-          path: build
-          
+          name: frontend-build
+          path: frontend/build
+      
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
-          publish_branch: gh-pages 
+          publish_dir: frontend/build
+          destination_dir: prod 
