@@ -103,6 +103,7 @@ jobs:
           publish_dir: build
           destination_dir: dev
           commit_message: "Deploy to development"
+          force_orphan: true
 
   deploy-homolog:
     name: Deploy to Homologation
