@@ -102,6 +102,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: build
           destination_dir: dev
+          commit_message: "Deploy to development"
 
   deploy-homolog:
     name: Deploy to Homologation
@@ -127,6 +128,8 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: build
           destination_dir: homolog
+          commit_message: "Deploy to homologation"
+          force_orphan: true
 
   deploy-prod:
     name: Deploy to Production
@@ -151,4 +154,6 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: build
-          destination_dir: prod 
+          destination_dir: prod
+          commit_message: "Deploy to production"
+          force_orphan: true 
