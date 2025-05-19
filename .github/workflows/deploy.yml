@@ -71,6 +71,12 @@ jobs:
       - name: List Build Directory
         run: ls -la build/
       
+      - name: Create index.html if not exists
+        run: |
+          if [ ! -f build/index.html ]; then
+            echo '<!DOCTYPE html><html><head><title>I Believe Finance</title></head><body><h1>I Believe Finance</h1></body></html>' > build/index.html
+          fi
+      
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -104,6 +110,7 @@ jobs:
           destination_dir: dev
           commit_message: "Deploy to development"
           force_orphan: true
+          enable_jekyll: false
 
   deploy-homolog:
     name: Deploy to Homologation
@@ -131,6 +138,7 @@ jobs:
           destination_dir: homolog
           commit_message: "Deploy to homologation"
           force_orphan: true
+          enable_jekyll: false
 
   deploy-prod:
     name: Deploy to Production
@@ -157,4 +165,5 @@ jobs:
           publish_dir: build
           destination_dir: prod
           commit_message: "Deploy to production"
-          force_orphan: true 
+          force_orphan: true
+          enable_jekyll: false 
