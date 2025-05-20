@@ -26,5 +26,9 @@ module.exports = {
       lines: 70,
       statements: 70
     }
+  },
+  modulePathIgnorePatterns: ['<rootDir>/build/'],
+  haste: {
+    forceNodeFilesystemAPI: true
   }
 };
