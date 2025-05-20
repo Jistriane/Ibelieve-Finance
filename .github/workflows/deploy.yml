@@ -4,6 +4,19 @@ on:
   push:
     branches:
       - master
+      - homolog
+      - dev
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Ambiente para deploy'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - homolog
+          - prod
 
 jobs:
   build-and-deploy:
@@ -21,34 +34,52 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Install Dependencies
         run: |
           cd frontend
-          npm install
+          npm ci
 
       - name: Build
         run: |
           cd frontend
           npm run build
         env:
-          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
-          REACT_APP_ENV: ${{ github.ref == 'refs/heads/master' && 'prod' || 'dev' }}
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+          VITE_ENV: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || github.ref_name }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
         with:
           static_site_generator: react
 
+      - name: Create gh-pages branch
+        run: |
+          git checkout --orphan gh-pages
+          git rm -rf .
+          git checkout master -- frontend/dist
+          git add frontend/dist
+          git commit -m "chore: inicializa branch gh-pages"
+          git push origin gh-pages --force
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: frontend/build
+          path: frontend/dist
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
         with:
-          path: frontend/build
+          path: frontend/dist
           branch: gh-pages
-          folder: ${{ github.ref == 'refs/heads/master' && 'prod' || 'dev' }} 
+          folder: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || github.ref_name }}
+
+      - name: Show Deployment URLs
+        run: |
+          echo "Ambiente de Desenvolvimento: https://jistriane.github.io/Ibelieve-Finance/dev"
+          echo "Ambiente de Homologação: https://jistriane.github.io/Ibelieve-Finance/homolog"
+          echo "Ambiente de Produção: https://jistriane.github.io/Ibelieve-Finance/prod"
+          echo "URL do Deploy Atual: https://jistriane.github.io/Ibelieve-Finance/${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || github.ref_name }}" 
