@@ -35,9 +35,6 @@ export async function connectWallet(): Promise<string> {
     const selectedAccount = accounts[0];
     currentAddress = selectedAccount.address;
     
-    // Configurar o signer
-    const injector = await web3FromSource(selectedAccount.meta.source);
-    
     return currentAddress;
   } catch (error) {
     console.error('Erro ao conectar carteira:', error);

@@ -1,8 +1,6 @@
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { web3Accounts, web3Enable, web3FromSource } from '@polkadot/extension-dapp';
 import { AccountInfo } from '@polkadot/types/interfaces';
-import { BN } from '@polkadot/util';
-import { Vec } from '@polkadot/types';
 import { Keyring } from '@polkadot/keyring';
 import { zkVerifyConfig } from '../config/zkverify';
 

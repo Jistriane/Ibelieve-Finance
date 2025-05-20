@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import './App.css';
 import { connectWallet, disconnectWallet } from './services/wallet';
 import { generateProof, ProofResult } from './services/proof';
-import { SolvencyForm } from './components/SolvencyForm';
 import { AINavigation } from './components/AINavigation';
 import NetworkInfoComponent from './components/NetworkInfo';
 
