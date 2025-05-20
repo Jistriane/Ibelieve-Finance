@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
-import proofsRouter from './routes/proofs';
+import { BlockchainService } from './services/blockchain';
 
 // Carrega as variáveis de ambiente
 const envFile = process.env.NODE_ENV === 'production' ? '.env-prod' : '.env-dev';
@@ -35,18 +35,57 @@ if (missingEnvVars.length > 0) {
 const app = express();
 
 // Configuração do CORS
-app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3001',
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+};
 
+app.use(cors(corsOptions));
 app.use(express.json());
 
-// Rotas
-app.use('/api/proofs', proofsRouter);
+// Serviço
+const blockchainService = new BlockchainService();
 
-const PORT = process.env.PORT || 3003;
+// Rotas
+app.post('/api/register-proof', async (req, res) => {
+  try {
+    const { proof, requestedAmount, netWorth, isApproved, walletAddress } = req.body;
+    const proofHash = await blockchainService.registerProof(
+      proof,
+      requestedAmount,
+      netWorth,
+      isApproved,
+      walletAddress
+    );
+    res.json({ success: true, proofHash });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/verify-proof/:proofHash', async (req, res) => {
+  try {
+    const { proofHash } = req.params;
+    const exists = await blockchainService.verifyProof(proofHash);
+    res.json({ success: true, exists });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/proof-details/:proofHash', async (req, res) => {
+  try {
+    const { proofHash } = req.params;
+    const details = await blockchainService.getProofDetails(proofHash);
+    res.json({ success: true, details });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+const PORT = process.env.PORT || 3004;
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);

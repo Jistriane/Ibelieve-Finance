@@ -90,6 +90,8 @@ jobs:
     if: github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
     environment: development
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       
@@ -118,6 +120,8 @@ jobs:
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     environment: homologation
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       
@@ -146,6 +150,8 @@ jobs:
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     environment: production
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       

@@ -1,3 +1,7 @@
 import React from 'react';
-declare function App(): React.JSX.Element;
+import './App.css';
+interface AppProps {
+    title?: string;
+}
+declare const App: React.FC<AppProps>;
 export default App;

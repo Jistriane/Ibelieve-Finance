@@ -37,10 +37,10 @@ router.post('/register', async (req, res) => {
     );
 
     console.log('Prova registrada com sucesso. Hash:', proofHash);
-    res.json({ proofHash });
+    return res.json({ proofHash });
   } catch (error) {
     console.error('Erro ao registrar prova:', error);
-    res.status(500).json({ error: 'Falha ao registrar prova' });
+    return res.status(500).json({ error: 'Falha ao registrar prova' });
   }
 });
 
@@ -62,10 +62,10 @@ router.get('/verify/:proofHash', async (req, res) => {
     // Obtém os detalhes da prova
     const details = await blockchainService.getProofDetails(proofHash);
     
-    res.json(details);
+    return res.json(details);
   } catch (error) {
     console.error('Erro ao verificar prova:', error);
-    res.status(500).json({ error: 'Falha ao verificar prova' });
+    return res.status(500).json({ error: 'Falha ao verificar prova' });
   }
 });
 

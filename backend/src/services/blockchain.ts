@@ -1,69 +1,62 @@
-import { ethers } from 'ethers';
-import { keccak256 } from 'ethers/lib/utils';
-import ProofRegistry from '../../artifacts/contracts/ProofRegistry.sol/ProofRegistry.json';
+import { ApiPromise, WsProvider } from '@polkadot/api';
+import { ISubmittableResult } from '@polkadot/types/types';
+import { Option } from '@polkadot/types';
+import dotenv from 'dotenv';
+
+// Carregar variáveis de ambiente
+dotenv.config({ path: '.env-dev' });
+
+interface ProofDetails {
+  timestamp: number;
+  requestedAmount: number;
+  netWorth: number;
+  isApproved: boolean;
+  walletAddress: string;
+}
 
 export class BlockchainService {
-  private provider: ethers.providers.JsonRpcProvider;
-  private contract: ethers.Contract;
-  private wallet: ethers.Wallet;
+  private api: ApiPromise | null = null;
+  private wsEndpoint: string;
 
   constructor() {
-    try {
-      // Configuração do provedor e carteira
-      console.log('Iniciando conexão com a testnet do zkVerify...');
-      console.log('ETHEREUM_RPC_URL:', process.env.ETHEREUM_RPC_URL);
-      
-      // Configuração do provedor
-      this.provider = new ethers.providers.JsonRpcProvider(process.env.ETHEREUM_RPC_URL, {
-        name: 'zkverify-testnet',
-        chainId: 14000 // Chain ID da testnet do zkVerify
-      });
-      
-      // Verifica conexão com a rede
-      this.provider.getNetwork().then(network => {
-        console.log('Conectado à rede:', network);
-      }).catch(error => {
-        console.error('Erro ao conectar à rede:', error);
-        throw new Error('Não foi possível conectar à testnet do zkVerify. Verifique a URL e a conexão.');
-      });
+    this.wsEndpoint = process.env.WS_ENDPOINT || 'ws://localhost:9944';
+    console.log('BlockchainService inicializado com endpoint:', this.wsEndpoint);
+  }
 
-      // Configuração da carteira SubWallet
-      if (!process.env.SUBWALLET_ENDPOINT || !process.env.SUBWALLET_TOKEN) {
-        throw new Error('Configuração da carteira SubWallet incompleta');
+  private async ensureApiInitialized() {
+    if (!this.api) {
+      console.log('Inicializando conexão com a blockchain...');
+      try {
+        const provider = new WsProvider(this.wsEndpoint);
+        this.api = await ApiPromise.create({ provider });
+        await this.api.isReady;
+        console.log('Conexão com a blockchain estabelecida com sucesso');
+      } catch (error) {
+        console.error('Erro ao inicializar API:', error);
+        throw new Error(`Falha ao conectar com a blockchain: ${error.message}`);
       }
-      console.log('Carteira SubWallet configurada:', process.env.SUBWALLET_ENDPOINT);
-      console.log('Token SubWallet:', process.env.SUBWALLET_TOKEN);
-
-      // Configuração da carteira
-      if (!process.env.PRIVATE_KEY) {
-        throw new Error('PRIVATE_KEY não definida');
-      }
-      this.wallet = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
-      console.log('Carteira configurada:', this.wallet.address);
-    
-      // Configuração do contrato
-      if (!process.env.PROOF_REGISTRY_ADDRESS) {
-        throw new Error('PROOF_REGISTRY_ADDRESS não definida');
-      }
-      this.contract = new ethers.Contract(
-        process.env.PROOF_REGISTRY_ADDRESS,
-        ProofRegistry.abi,
-        this.wallet
-      );
-      console.log('Contrato configurado:', process.env.PROOF_REGISTRY_ADDRESS);
-    } catch (error) {
-      console.error('Erro ao inicializar BlockchainService:', error);
-      throw error;
     }
   }
 
-  // Gera um hash único para a prova
   private generateProofHash(proof: any): string {
-    const proofString = JSON.stringify(proof);
-    return keccak256(ethers.utils.toUtf8Bytes(proofString));
+    try {
+      console.log('Gerando hash da prova...');
+      const proofString = JSON.stringify(proof);
+      console.log('Prova serializada:', proofString.substring(0, 100) + '...');
+      
+      if (!this.api) {
+        throw new Error('API não inicializada');
+      }
+
+      const hash = this.api.createType('Hash', proofString).toHex();
+      console.log('Hash gerado:', hash);
+      return hash;
+    } catch (error) {
+      console.error('Erro ao gerar hash da prova:', error);
+      throw new Error(`Falha ao gerar hash da prova: ${error.message}`);
+    }
   }
 
-  // Registra uma prova na blockchain
   async registerProof(
     proof: any,
     requestedAmount: number,
@@ -72,6 +65,11 @@ export class BlockchainService {
     walletAddress: string
   ): Promise<string> {
     try {
+      await this.ensureApiInitialized();
+      if (!this.api) {
+        throw new Error('API não inicializada');
+      }
+
       console.log('Iniciando registro de prova na blockchain...');
       console.log('Parâmetros:', {
         requestedAmount,
@@ -86,8 +84,8 @@ export class BlockchainService {
       }
 
       const proofHash = this.generateProofHash(proof);
-      const requestedAmountBN = ethers.BigNumber.from(requestedAmount.toString());
-      const netWorthBN = ethers.BigNumber.from(netWorth.toString());
+      const requestedAmountBN = this.api.createType('Balance', requestedAmount.toString());
+      const netWorthBN = this.api.createType('Balance', netWorth.toString());
 
       console.log('Dados preparados:', {
         proofHash,
@@ -97,31 +95,40 @@ export class BlockchainService {
         walletAddress
       });
 
-      // Verifica saldo da carteira
-      const balance = await this.wallet.getBalance();
-      console.log('Saldo da carteira:', ethers.utils.formatEther(balance), 'ETH');
-
-      if (balance.isZero()) {
-        throw new Error('Carteira sem saldo para realizar a transação');
-      }
-
       // Registra a prova
       console.log('Enviando transação...');
-      const tx = await this.contract.registerProof(
+      const tx = await this.api.tx.proofRegistry.registerProof(
         proofHash,
         requestedAmountBN,
         netWorthBN,
         isApproved,
         walletAddress
       );
-      console.log('Transação enviada:', tx.hash);
 
-      // Aguarda confirmação
-      console.log('Aguardando confirmação...');
-      await tx.wait();
-      console.log('Transação confirmada!');
-
-      return proofHash;
+      console.log('Transação criada, aguardando assinatura...');
+      
+      return new Promise((resolve, reject) => {
+        tx.signAndSend(walletAddress, (result: ISubmittableResult) => {
+          console.log('Status da transação:', result.status.toString());
+          
+          if (result.status.isInBlock) {
+            console.log('Transação incluída no bloco:', result.status.asInBlock.toHex());
+          }
+          
+          if (result.status.isFinalized) {
+            console.log('Transação finalizada:', result.status.asFinalized.toHex());
+            resolve(proofHash);
+          }
+          
+          if (result.isError) {
+            console.error('Erro na transação:', result.toString());
+            reject(new Error('Transação falhou'));
+          }
+        }).catch(error => {
+          console.error('Erro ao enviar transação:', error);
+          reject(error);
+        });
+      });
     } catch (error) {
       console.error('Erro detalhado ao registrar prova:', error);
       throw new Error(`Falha ao registrar prova na blockchain: ${error.message}`);
@@ -131,7 +138,12 @@ export class BlockchainService {
   // Verifica se uma prova existe na blockchain
   async verifyProof(proofHash: string): Promise<boolean> {
     try {
-      return await this.contract.verifyProof(proofHash);
+      await this.ensureApiInitialized();
+      if (!this.api) {
+        throw new Error('API não inicializada');
+      }
+      const result = await this.api.query.proofRegistry.verifyProof(proofHash) as Option<any>;
+      return result.isSome;
     } catch (error) {
       console.error('Erro ao verificar prova na blockchain:', error);
       throw new Error('Falha ao verificar prova na blockchain');
@@ -139,26 +151,41 @@ export class BlockchainService {
   }
 
   // Obtém os detalhes de uma prova da blockchain
-  async getProofDetails(proofHash: string): Promise<{
-    timestamp: number;
-    requestedAmount: number;
-    netWorth: number;
-    isApproved: boolean;
-    walletAddress: string;
-  }> {
+  async getProofDetails(proofHash: string): Promise<ProofDetails> {
     try {
-      const details = await this.contract.getProofDetails(proofHash);
+      await this.ensureApiInitialized();
+      if (!this.api) {
+        throw new Error('API não inicializada');
+      }
+      const details = await this.api.query.proofRegistry.getProofDetails(proofHash) as Option<any>;
       
+      if (!details.isSome) {
+        throw new Error('Prova não encontrada');
+      }
+
+      const proofData = details.unwrap();
       return {
-        timestamp: details.timestamp.toNumber(),
-        requestedAmount: details.requestedAmount.toNumber(),
-        netWorth: details.netWorth.toNumber(),
-        isApproved: details.isApproved,
-        walletAddress: details.walletAddress
+        timestamp: proofData.timestamp.toNumber(),
+        requestedAmount: proofData.requestedAmount.toNumber(),
+        netWorth: proofData.netWorth.toNumber(),
+        isApproved: proofData.isApproved,
+        walletAddress: proofData.walletAddress.toString()
       };
     } catch (error) {
       console.error('Erro ao obter detalhes da prova na blockchain:', error);
       throw new Error('Falha ao obter detalhes da prova na blockchain');
+    }
+  }
+
+  async disconnect(): Promise<void> {
+    try {
+      if (this.api) {
+        await this.api.disconnect();
+        this.api = null;
+      }
+      console.log('Desconectado da rede');
+    } catch (error) {
+      console.error('Erro ao desconectar:', error);
     }
   }
 } 

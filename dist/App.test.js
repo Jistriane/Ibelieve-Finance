@@ -8,10 +8,9 @@ const react_2 = require("@testing-library/react");
 require("@testing-library/jest-dom");
 const App_1 = __importDefault(require("./App"));
 describe('App', () => {
-    test('renders learn react link', () => {
+    it('renders without crashing', () => {
         (0, react_2.render)(react_1.default.createElement(App_1.default, null));
-        const linkElement = react_2.screen.getByText(/learn react/i);
-        expect(linkElement).toBeInTheDocument();
+        expect(react_2.screen.getByRole('main')).toBeInTheDocument();
     });
 });
 //# sourceMappingURL=App.test.js.map
