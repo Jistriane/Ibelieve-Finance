@@ -30,6 +30,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -47,7 +50,12 @@ jobs:
         run: |
           cd frontend
           CI=false npm run build
-          ls -la dist
+          echo "Verificando diretório build..."
+          ls -la build
+          if [ ! -d "build" ]; then
+            echo "Erro: Diretório build não encontrado"
+            exit 1
+          fi
         env:
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
           VITE_ENV: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || github.ref_name }}
@@ -60,13 +68,13 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: frontend/dist
+          path: frontend/build
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
         with:
-          path: frontend/dist
+          path: frontend/build
           branch: gh-pages
           folder: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || github.ref_name }}
 
