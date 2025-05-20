@@ -47,6 +47,7 @@ jobs:
         run: |
           cd frontend
           CI=false npm run build
+          ls -la dist
         env:
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
           VITE_ENV: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || github.ref_name }}
