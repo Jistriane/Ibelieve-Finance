@@ -1,7 +1,10 @@
-name: Deploy to GitHub Pages
+# .github/workflows/deploy-frontend.yml
+name: Deploy Frontend to GitHub Pages
 
 on:
   push:
+    paths:
+      - 'frontend/**'
     branches:
       - main
       - master
@@ -60,8 +63,14 @@ jobs:
             exit 1
           fi
         env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL }}
-          VITE_ENV: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || github.ref_name }}
+           REACT_APP_ZKVERIFY_WS_ENDPOINT: ${{ env.REACT_APP_ZKVERIFY_WS_ENDPOINT }}
+           REACT_APP_ZKVERIFY_RPC_ENDPOINT: ${{ env.REACT_APP_ZKVERIFY_RPC_ENDPOINT }}
+           REACT_APP_CHAIN_ID: ${{ env.REACT_APP_CHAIN_ID }}
+           REACT_APP_NETWORK_NAME: ${{ env.REACT_APP_NETWORK_NAME }}
+           REACT_APP_PROOF_REGISTRY_ADDRESS: ${{ env.REACT_APP_PROOF_REGISTRY_ADDRESS }}
+           REACT_APP_ENV: ${{ env.REACT_APP_ENV }}
+           REACT_APP_SUBWALLET_ENDPOINT: ${{ env.REACT_APP_SUBWALLET_ENDPOINT }}
+           REACT_APP_SUBWALLET_APP_NAME: ${{ env.REACT_APP_SUBWALLET_APP_NAME }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -84,4 +93,4 @@ jobs:
           echo "Ambiente de Desenvolvimento: https://jistriane.github.io/Ibelieve-Finance/dev"
           echo "Ambiente de Homologação: https://jistriane.github.io/Ibelieve-Finance/homolog"
           echo "Ambiente de Produção: https://jistriane.github.io/Ibelieve-Finance/prod"
-          echo "URL do Deploy Atual: ${{ steps.deployment.outputs.page_url }}" 
+          echo "URL do Deploy Atual: ${{ steps.deployment.outputs.page_url }}"

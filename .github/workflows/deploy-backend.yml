@@ -1,0 +1,55 @@
+# .github/workflows/deploy-backend.yml
+name: Deploy Backend to Railway
+
+on:
+  push:
+    paths:
+      - 'backend/**'
+    branches:
+      - main
+      - dev
+      - homolog
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          npm ci
+
+      - name: Deploy to Railway
+        run: |
+          cd backend
+          railway login --token ${{ secrets.RAILWAY_TOKEN }}
+          railway up --service=backend
+        env:
+          RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
+          ETHEREUM_RPC_URL: ${{ env.ETHEREUM_RPC_URL }}
+          WS_ENDPOINT: ${{ env.WS_ENDPOINT }}
+          CHAIN_ID: ${{ env.CHAIN_ID }}
+          NETWORK_NAME: ${{ env.NETWORK_NAME }}
+          ACCOUNT_ADDRESS: ${{ env.ACCOUNT_ADDRESS }}
+          PRIVATE_KEY: ${{ env.PRIVATE_KEY }}
+          PROOF_REGISTRY_ADDRESS: ${{ env.PROOF_REGISTRY_ADDRESS }}
+          PORT: ${{ env.PORT }}
+          NODE_ENV: ${{ env.NODE_ENV }}
+          CORS_ORIGIN: ${{ env.CORS_ORIGIN }}
+          LOG_LEVEL: ${{ env.LOG_LEVEL }}
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+          SUBWALLET_ENDPOINT: ${{ env.SUBWALLET_ENDPOINT }}
+          SUBWALLET_APP_NAME: ${{ env.SUBWALLET_APP_NAME }}
+          SUBWALLET_TOKEN: ${{ env.SUBWALLET_TOKEN }}
+          JWT_SECRET: ${{ env.JWT_SECRET }}
