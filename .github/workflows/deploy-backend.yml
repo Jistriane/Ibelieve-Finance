@@ -36,7 +36,7 @@ jobs:
           railway login --token ${{ secrets.RAILWAY_TOKEN }}
           railway up --service=backend
         env:
-          RAILWAY_TOKEN: ${{ env.RAILWAY_TOKEN }}
+          RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
           ETHEREUM_RPC_URL: ${{ env.ETHEREUM_RPC_URL }}
           WS_ENDPOINT: ${{ env.WS_ENDPOINT }}
           CHAIN_ID: ${{ env.CHAIN_ID }}
