@@ -1,0 +1,88 @@
+groups:
+  - name: hasher
+    rules:
+      # Alertas de disponibilidade
+      - alert: APIUnavailable
+        expr: up{job="hasher-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "API indisponível"
+          description: "A API está indisponível há mais de 1 minuto"
+
+      # Alertas de performance
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le)) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Alta latência na API"
+          description: "95% das requisições estão levando mais de 1 segundo"
+
+      - alert: HighErrorRate
+        expr: rate(http_request_errors_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Alta taxa de erros"
+          description: "Taxa de erros acima de 10% nos últimos 5 minutos"
+
+      # Alertas de recursos
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Alto uso de memória"
+          description: "Uso de memória acima de 85%"
+
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Alto uso de CPU"
+          description: "Uso de CPU acima de 80%"
+
+      # Alertas de serviços
+      - alert: RedisDown
+        expr: up{job="redis-exporter"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Redis indisponível"
+          description: "O Redis está indisponível há mais de 1 minuto"
+
+      - alert: ElasticsearchDown
+        expr: up{job="elasticsearch-exporter"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Elasticsearch indisponível"
+          description: "O Elasticsearch está indisponível há mais de 1 minuto"
+
+      # Alertas de negócio
+      - alert: HighZKPErrorRate
+        expr: rate(zkp_proof_generation{status="error"}[5m]) / rate(zkp_proof_generation_total[5m]) * 100 > 5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Alta taxa de erros em provas ZKP"
+          description: "Taxa de erros em provas ZKP acima de 5%"
+
+      - alert: OpenFinanceErrors
+        expr: rate(openfinance_errors_total[5m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Erros no Open Finance"
+          description: "Ocorreram erros nas requisições ao Open Finance" 

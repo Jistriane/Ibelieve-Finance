@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  hasher:
+    extends:
+      file: ./hasher/docker-compose.yml
+      service: app
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./hasher:/app
+      - /app/node_modules
+    depends_on:
+      - redis
+      - elasticsearch
+      - prometheus
+      - grafana
+
+  redis:
+    extends:
+      file: ./hasher/docker-compose.yml
+      service: redis
+
+  elasticsearch:
+    extends:
+      file: ./hasher/docker-compose.yml
+      service: elasticsearch
+
+  prometheus:
+    extends:
+      file: ./hasher/docker-compose.yml
+      service: prometheus
+
+  alertmanager:
+    extends:
+      file: ./hasher/docker-compose.yml
+      service: alertmanager
+
+  grafana:
+    extends:
+      file: ./hasher/docker-compose.yml
+      service: grafana
+
+networks:
+  hasher-network:
+    driver: bridge
+
+volumes:
+  redis-data:
+  elasticsearch-data:
+  prometheus-data:
+  alertmanager-data:
+  grafana-data: 

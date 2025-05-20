@@ -1,0 +1,66 @@
+{
+  "name": "ibelieve-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@polkadot/api": "^10.11.2",
+    "@polkadot/extension-dapp": "^0.46.6",
+    "@polkadot/keyring": "^12.6.2",
+    "@polkadot/types": "^10.11.2",
+    "@polkadot/util": "^12.6.2",
+    "@types/node": "^16.18.68",
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "axios": "^1.6.7",
+    "circomlib": "^2.0.5",
+    "ethers": "^5.7.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "snarkjs": "^0.7.5",
+    "typescript": "^4.9.5",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "compile-circuit": "node scripts/compile-circuit.js",
+    "test:connection": "NODE_PATH=src ts-node -P tsconfig.json src/tests/testConnection.ts"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^16.18.68",
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "@types/snarkjs": "^0.7.0",
+    "autoprefixer": "^10.4.21",
+    "identity-obj-proxy": "^3.0.0",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.7",
+    "ts-jest": "^29.3.4",
+    "ts-node": "^10.9.2"
+  }
+}

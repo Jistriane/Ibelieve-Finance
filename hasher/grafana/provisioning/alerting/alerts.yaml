@@ -1,0 +1,51 @@
+apiVersion: 1
+
+groups:
+  - name: Ibelieve Alerts
+    folder: Ibelieve
+    interval: 1m
+    rules:
+      - name: High Error Rate
+        condition: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Alta taxa de erros detectada"
+          description: "Taxa de erros HTTP 5xx está acima de 5% nos últimos 5 minutos"
+
+      - name: High Latency
+        condition: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Alta latência detectada"
+          description: "95º percentil de latência está acima de 1 segundo"
+
+      - name: Service Down
+        condition: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Serviço indisponível"
+          description: "O serviço {{ $labels.job }} está fora do ar"
+
+      - name: High Memory Usage
+        condition: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Alto uso de memória"
+          description: "Uso de memória está acima de 90%"
+
+      - name: High CPU Usage
+        condition: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Alto uso de CPU"
+          description: "Uso de CPU está acima de 80%" 

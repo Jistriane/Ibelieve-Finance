@@ -1,0 +1,56 @@
+[database]
+url = "postgres://ibeleve:ibeleve@postgres:5432/ibeleve_staging"
+
+[redis]
+url = "redis://redis:6379"
+
+[auth]
+jwt_secret = "your_jwt_secret_staging"
+jwt_expiration = 3600
+
+[blockchain]
+rpc_url = "https://mainnet.infura.io/v3/your_key"
+network = "mainnet"
+
+[ai]
+model_path = "/app/models"
+confidence_threshold = 0.85
+
+[zkp]
+verification_key_path = "/app/keys/verification.key"
+proving_key_path = "/app/keys/proving.key"
+
+[log]
+level = "info"
+backtrace = true
+
+[service]
+api_gateway_port = 8080
+auth_service_port = 8081
+zkp_service_port = 8082
+ai_service_port = 8083
+blockchain_service_port = 8084
+user_service_port = 8085
+
+[cors]
+allowed_origins = ["https://staging.ibeleve.com", "https://api-staging.ibeleve.com"]
+allowed_methods = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+allowed_headers = ["Content-Type", "Authorization"]
+
+[rate_limit]
+requests = 500
+duration = 60
+
+[cache]
+ttl = 3600
+prefix = "ibeleve_staging_"
+
+[security]
+encryption_key = "your_encryption_key_staging"
+hash_salt = "your_hash_salt_staging"
+
+[monitoring]
+enable_metrics = true
+metrics_port = 9090
+enable_tracing = true
+tracing_service_name = "ibeleve_staging" 

@@ -1,0 +1,102 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      postgres:
+        image: postgres:13-alpine
+        env:
+          POSTGRES_USER: ibeleve
+          POSTGRES_PASSWORD: ibeleve
+          POSTGRES_DB: ibeleve_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: |
+        npm ci
+        npm install -g jest
+
+    - name: Run linter
+      run: npm run lint
+
+    - name: Run tests
+      run: npm test
+      env:
+        NODE_ENV: test
+        DATABASE_URL: postgres://ibeleve:ibeleve@localhost:5432/ibeleve_test
+        REDIS_URL: redis://localhost:6379
+        REDIS_HOST: localhost
+        REDIS_PORT: 6379
+        REDIS_PASSWORD: ibeleve123
+        REDIS_DB: 0
+        OPENFINANCE_CLIENT_ID: test_client_id
+        OPENFINANCE_CLIENT_SECRET: test_client_secret
+        OPENFINANCE_REDIRECT_URI: http://localhost:3000/callback
+        OPENFINANCE_AUTH_URL: https://auth.openfinance.test/authorize
+        OPENFINANCE_TOKEN_URL: https://auth.openfinance.test/token
+        OPENFINANCE_BASE_URL: https://api.openfinance.test
+        LOG_LEVEL: error
+        METRICS_ENABLED: false
+
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build
+      run: npm run build
+
+    - name: Deploy to production
+      run: |
+        echo "Deploying to production..."
+        # Adicione aqui os comandos de deploy
+      env:
+        DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+
+    - name: Start server
+      run: |
+        cd /home/kali/Ibelieve/hasher
+        ./start-server.sh 

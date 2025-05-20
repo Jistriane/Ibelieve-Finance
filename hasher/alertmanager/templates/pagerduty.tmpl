@@ -1,0 +1,22 @@
+{{ define "pagerduty.default.description" }}
+[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }}
+{{ end }}
+
+{{ define "pagerduty.default.client" }}
+Hasher API
+{{ end }}
+
+{{ define "pagerduty.default.clientURL" }}
+{{ .CommonAnnotations.grafana_url }}
+{{ end }}
+
+{{ define "pagerduty.default.details" }}
+{{ range .Alerts }}
+Alerta: {{ .Labels.alertname }}
+Status: {{ .Status | toUpper }}
+{{ if .Labels.severity }}Severidade: {{ .Labels.severity }}{{ end }}
+{{ if .Labels.instance }}Instância: {{ .Labels.instance }}{{ end }}
+{{ if .Annotations.summary }}Resumo: {{ .Annotations.summary }}{{ end }}
+{{ if .Annotations.description }}Descrição: {{ .Annotations.description }}{{ end }}
+{{ end }}
+{{ end }} 

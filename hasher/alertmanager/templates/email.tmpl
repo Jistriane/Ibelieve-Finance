@@ -1,0 +1,115 @@
+{{ define "email.default.subject" }}
+[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }}
+{{ end }}
+
+{{ define "email.default.html" }}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ template "email.default.subject" . }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .alert {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .alert-firing {
+            border-left: 4px solid #e74c3c;
+        }
+        .alert-resolved {
+            border-left: 4px solid #2ecc71;
+        }
+        .alert-header {
+            margin-bottom: 10px;
+        }
+        .alert-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .alert-status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status-firing {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .status-resolved {
+            background-color: #2ecc71;
+            color: white;
+        }
+        .alert-details {
+            margin-top: 10px;
+        }
+        .alert-label {
+            font-weight: bold;
+        }
+        .alert-value {
+            margin-left: 5px;
+        }
+        .alert-description {
+            margin-top: 10px;
+            color: #666;
+        }
+        .alert-footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    {{ range .Alerts }}
+    <div class="alert alert-{{ .Status }}">
+        <div class="alert-header">
+            <h2 class="alert-title">{{ .Labels.alertname }}</h2>
+            <span class="alert-status status-{{ .Status }}">{{ .Status | toUpper }}</span>
+        </div>
+        <div class="alert-details">
+            {{ if .Labels.severity }}
+            <div>
+                <span class="alert-label">Severidade:</span>
+                <span class="alert-value">{{ .Labels.severity }}</span>
+            </div>
+            {{ end }}
+            {{ if .Labels.instance }}
+            <div>
+                <span class="alert-label">Instância:</span>
+                <span class="alert-value">{{ .Labels.instance }}</span>
+            </div>
+            {{ end }}
+            {{ if .Annotations.summary }}
+            <div class="alert-description">
+                <span class="alert-label">Resumo:</span>
+                <span class="alert-value">{{ .Annotations.summary }}</span>
+            </div>
+            {{ end }}
+            {{ if .Annotations.description }}
+            <div class="alert-description">
+                <span class="alert-label">Descrição:</span>
+                <span class="alert-value">{{ .Annotations.description }}</span>
+            </div>
+            {{ end }}
+        </div>
+    </div>
+    {{ end }}
+    <div class="alert-footer">
+        <p>Este é um email automático do sistema de monitoramento.</p>
+        <p>Para mais informações, acesse o <a href="{{ .CommonAnnotations.grafana_url }}">Grafana</a>.</p>
+    </div>
+</body>
+</html>
+{{ end }} 

@@ -1,0 +1,25 @@
+{
+    "blockchain": {
+        "rpc_url": "https://mainnet.infura.io/v3/seu-project-id",
+        "chain_id": 1,
+        "contract_address": "0x1234567890123456789012345678901234567890",
+        "gas_limit": 3000000
+    },
+    "kyc": {
+        "min_score_risco": 0,
+        "max_score_risco": 100,
+        "documentos_aceitos": [
+            "CPF",
+            "CNPJ",
+            "Passaporte"
+        ]
+    },
+    "rate_limit": {
+        "max_requests": 100,
+        "window_seconds": 3600
+    },
+    "logging": {
+        "level": "info",
+        "file_path": "logs/app.log"
+    }
+} 
