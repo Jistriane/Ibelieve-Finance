@@ -81,7 +81,7 @@ jobs:
       - name: Create index.html if not exists
         run: |
           if [ ! -f build/index.html ]; then
-            echo '<!DOCTYPE html><html><head><title>I Believe Finance</title></head><body><h1>I Believe Finance</h1></body></html>' > build/index.html
+            echo '<!DOCTYPE html><html><head><title>I Believe Finance</title><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body><div id="root"><h1>I Believe Finance</h1></div></body></html>' > build/index.html
           fi
       
       - name: Upload Build Artifact
@@ -119,6 +119,7 @@ jobs:
           commit_message: "Deploy to development"
           force_orphan: true
           enable_jekyll: false
+          cname: jistriane.github.io
 
   deploy-homolog:
     name: Deploy to Homologation
@@ -148,6 +149,7 @@ jobs:
           commit_message: "Deploy to homologation"
           force_orphan: true
           enable_jekyll: false
+          cname: jistriane.github.io
 
   deploy-prod:
     name: Deploy to Production
@@ -176,4 +178,5 @@ jobs:
           destination_dir: prod
           commit_message: "Deploy to production"
           force_orphan: true
-          enable_jekyll: false 
+          enable_jekyll: false
+          cname: jistriane.github.io 
