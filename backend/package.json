@@ -13,10 +13,12 @@
     "node": "hardhat node"
   },
   "dependencies": {
+    "@polkadot/api": "^16.0.1",
+    "@polkadot/types": "^16.0.1",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
-    "express": "^4.18.2",
-    "ethers": "^5.7.2"
+    "ethers": "^5.7.2",
+    "express": "^4.18.2"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.2.3",
