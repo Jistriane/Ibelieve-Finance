@@ -94,7 +94,6 @@ jobs:
   deploy-dev:
     name: Deploy to Development
     needs: build
-    if: github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
     environment: development
     permissions:
@@ -123,8 +122,7 @@ jobs:
 
   deploy-homolog:
     name: Deploy to Homologation
-    needs: build
-    if: github.ref == 'refs/heads/master'
+    needs: [build, deploy-dev]
     runs-on: ubuntu-latest
     environment: homologation
     permissions:
@@ -153,8 +151,7 @@ jobs:
 
   deploy-prod:
     name: Deploy to Production
-    needs: deploy-homolog
-    if: github.ref == 'refs/heads/master'
+    needs: [build, deploy-homolog]
     runs-on: ubuntu-latest
     environment: production
     permissions:
