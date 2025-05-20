@@ -43,4 +43,12 @@ cd ../Ibelieve
 
 # Remover pasta temporária
 echo "Limpando..."
-rm -rf "$TEMP_DIR" 
+rm -rf "$TEMP_DIR"
+
+echo "Deploy concluído!"
+echo "Links do deploy:"
+echo "1. URL Principal: https://jistriane.github.io/Ibelieve-Finance/"
+echo "2. URL do Pipeline: https://github.com/Jistriane/Ibelieve-Finance/actions"
+echo "3. URL do Repositório: https://github.com/Jistriane/Ibelieve-Finance"
+echo ""
+echo "O pipeline será executado automaticamente. Você pode acompanhar o progresso na URL do Pipeline." 
