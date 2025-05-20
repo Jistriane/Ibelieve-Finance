@@ -22,6 +22,9 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     permissions:
       contents: write
       pages: write
@@ -74,13 +77,11 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
         with:
-          path: frontend/build
-          branch: gh-pages
-          folder: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || github.ref_name }}
+          artifact_name: github-pages
 
       - name: Show Deployment URLs
         run: |
           echo "Ambiente de Desenvolvimento: https://jistriane.github.io/Ibelieve-Finance/dev"
           echo "Ambiente de Homologação: https://jistriane.github.io/Ibelieve-Finance/homolog"
           echo "Ambiente de Produção: https://jistriane.github.io/Ibelieve-Finance/prod"
-          echo "URL do Deploy Atual: https://jistriane.github.io/Ibelieve-Finance/${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || github.ref_name }}" 
+          echo "URL do Deploy Atual: ${{ steps.deployment.outputs.page_url }}" 
