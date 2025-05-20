@@ -39,7 +39,6 @@ target/
 *.r1cs
 *.wasm
 *.zkey
-*.json
 *.wtns
 *.sol
 

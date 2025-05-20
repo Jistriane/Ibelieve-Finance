@@ -1,182 +1,54 @@
-name: Deploy Pipeline
+name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ develop, master ]
-  pull_request:
-    branches: [ develop, master ]
-
-env:
-  NODE_VERSION: '20.x'
-  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    branches:
+      - master
 
 jobs:
-  security-scan:
-    name: Security Scan
+  build-and-deploy:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
-        with:
-          languages: javascript
-          
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
 
-  test:
-    name: Test
-    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: |
-            **/package-lock.json
-            **/package.json
-      
-      - name: Install Dependencies
-        run: npm install --legacy-peer-deps
-      
-      - name: Run Tests
-        run: npm test -- --passWithNoTests --coverage
-      
-      - name: Upload Coverage Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: coverage/
-          retention-days: 7
+          node-version: '20'
 
-  build:
-    name: Build
-    needs: [security-scan, test]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: |
-            **/package-lock.json
-            **/package.json
-      
       - name: Install Dependencies
-        run: npm install --legacy-peer-deps
-      
-      - name: Build
-        run: npm run build
-      
-      - name: List Build Directory
-        run: ls -la build/
-      
-      - name: Create index.html if not exists
         run: |
-          if [ ! -f build/index.html ]; then
-            echo '<!DOCTYPE html><html><head><title>I Believe Finance</title><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body><div id="root"><h1>I Believe Finance</h1></div></body></html>' > build/index.html
-          fi
-      
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-artifact
-          path: build/
-          retention-days: 1
+          cd frontend
+          npm install
 
-  deploy-dev:
-    name: Deploy to Development
-    needs: build
-    runs-on: ubuntu-latest
-    environment: development
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Download Build Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifact
-          path: build
-      
-      - name: List Downloaded Files
-        run: ls -la build/
-      
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: build
-          destination_dir: dev
-          commit_message: "Deploy to development"
-          force_orphan: true
-          enable_jekyll: false
-          cname: jistriane.github.io
+      - name: Build
+        run: |
+          cd frontend
+          npm run build
+        env:
+          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
+          REACT_APP_ENV: ${{ github.ref == 'refs/heads/master' && 'prod' || 'dev' }}
 
-  deploy-homolog:
-    name: Deploy to Homologation
-    needs: [build, deploy-dev]
-    runs-on: ubuntu-latest
-    environment: homologation
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Download Build Artifact
-        uses: actions/download-artifact@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
         with:
-          name: build-artifact
-          path: build
-      
-      - name: List Downloaded Files
-        run: ls -la build/
-      
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: build
-          destination_dir: homolog
-          commit_message: "Deploy to homologation"
-          force_orphan: true
-          enable_jekyll: false
-          cname: jistriane.github.io
+          static_site_generator: react
 
-  deploy-prod:
-    name: Deploy to Production
-    needs: [build, deploy-homolog]
-    runs-on: ubuntu-latest
-    environment: production
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Download Build Artifact
-        uses: actions/download-artifact@v4
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: build-artifact
-          path: build
-      
-      - name: List Downloaded Files
-        run: ls -la build/
-      
+          path: frontend/build
+
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        id: deployment
+        uses: actions/deploy-pages@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: build
-          destination_dir: prod
-          commit_message: "Deploy to production"
-          force_orphan: true
-          enable_jekyll: false
-          cname: jistriane.github.io 
+          path: frontend/build
+          branch: gh-pages
+          folder: ${{ github.ref == 'refs/heads/master' && 'prod' || 'dev' }} 
