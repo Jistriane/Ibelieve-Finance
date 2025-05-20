@@ -2,7 +2,7 @@
   "name": "ibelieve-frontend",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://jistriane.github.io/Ibelieve-Finance/"
+  "homepage": "https://jistriane.github.io/Ibelieve-Finance/",
   "dependencies": {
     "@polkadot/api": "^10.11.2",
     "@polkadot/extension-dapp": "^0.46.6",
