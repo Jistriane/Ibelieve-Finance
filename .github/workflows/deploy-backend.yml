@@ -36,20 +36,20 @@ jobs:
           railway login --token ${{ secrets.RAILWAY_TOKEN }}
           railway up --service=backend
         env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          ETHEREUM_RPC_URL: ${{ secrets.ETHEREUM_RPC_URL }}
-          WS_ENDPOINT: ${{ secrets.WS_ENDPOINT }}
-          CHAIN_ID: ${{ secrets.CHAIN_ID }}
-          NETWORK_NAME: ${{ secrets.NETWORK_NAME }}
-          ACCOUNT_ADDRESS: ${{ secrets.ACCOUNT_ADDRESS }}
-          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
-          PROOF_REGISTRY_ADDRESS: ${{ secrets.PROOF_REGISTRY_ADDRESS }}
-          PORT: ${{ secrets.PORT }}
-          NODE_ENV: ${{ secrets.NODE_ENV }}
-          CORS_ORIGIN: ${{ secrets.CORS_ORIGIN }}
-          LOG_LEVEL: ${{ secrets.LOG_LEVEL }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          SUBWALLET_ENDPOINT: ${{ secrets.SUBWALLET_ENDPOINT }}
-          SUBWALLET_APP_NAME: ${{ secrets.SUBWALLET_APP_NAME }}
-          SUBWALLET_TOKEN: ${{ secrets.SUBWALLET_TOKEN }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          RAILWAY_TOKEN: ${{ env.RAILWAY_TOKEN }}
+          ETHEREUM_RPC_URL: ${{ env.ETHEREUM_RPC_URL }}
+          WS_ENDPOINT: ${{ env.WS_ENDPOINT }}
+          CHAIN_ID: ${{ env.CHAIN_ID }}
+          NETWORK_NAME: ${{ env.NETWORK_NAME }}
+          ACCOUNT_ADDRESS: ${{ env.ACCOUNT_ADDRESS }}
+          PRIVATE_KEY: ${{ env.PRIVATE_KEY }}
+          PROOF_REGISTRY_ADDRESS: ${{ env.PROOF_REGISTRY_ADDRESS }}
+          PORT: ${{ env.PORT }}
+          NODE_ENV: ${{ env.NODE_ENV }}
+          CORS_ORIGIN: ${{ env.CORS_ORIGIN }}
+          LOG_LEVEL: ${{ env.LOG_LEVEL }}
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+          SUBWALLET_ENDPOINT: ${{ env.SUBWALLET_ENDPOINT }}
+          SUBWALLET_APP_NAME: ${{ env.SUBWALLET_APP_NAME }}
+          SUBWALLET_TOKEN: ${{ env.SUBWALLET_TOKEN }}
+          JWT_SECRET: ${{ env.JWT_SECRET }}
