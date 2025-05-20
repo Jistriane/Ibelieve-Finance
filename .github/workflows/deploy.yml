@@ -56,15 +56,6 @@ jobs:
         with:
           static_site_generator: react
 
-      - name: Create gh-pages branch
-        run: |
-          git checkout --orphan gh-pages
-          git rm -rf .
-          git checkout main -- frontend/dist || git checkout master -- frontend/dist
-          git add frontend/dist
-          git commit -m "chore: inicializa branch gh-pages"
-          git push origin gh-pages --force
-
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
