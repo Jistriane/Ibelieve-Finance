@@ -6,20 +6,25 @@ mkdir -p backup
 cp -r frontend backup/
 cp -r circom backup/
 
+# Verificar se estamos na branch master
+current_branch=$(git branch --show-current)
+if [ "$current_branch" != "master" ]; then
+    echo "Criando branch master..."
+    git checkout -b master
+fi
+
 # Remover do git
 echo "Removendo do git..."
-git rm -r --cached frontend/
-git rm -r --cached circom/
+git rm -r --cached .
 
-# Adicionar novamente
+# Adicionar tudo novamente
 echo "Adicionando ao git..."
-git add frontend/
-git add circom/
+git add .
 
 # Commit
 echo "Fazendo commit..."
-git commit -m "feat: adiciona conteúdo das pastas frontend e circom"
+git commit -m "feat: adiciona todo o conteúdo do repositório"
 
-# Push
-echo "Fazendo push..."
-git push origin master 
+# Forçar push com --force-with-lease
+echo "Forçando push..."
+git push --force-with-lease origin master 

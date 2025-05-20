@@ -1,0 +1,119 @@
+.financial-analysis {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #1a1a1a;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.financial-analysis h2 {
+  color: #fff;
+  font-size: 24px;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.analysis-controls {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.analyze-button {
+  padding: 12px 24px;
+  font-size: 16px;
+  background: linear-gradient(90deg, #7F5AF0, #2CB67D);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.analyze-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(47, 182, 125, 0.2);
+}
+
+.analyze-button:disabled {
+  background: #666;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.error-message {
+  color: #FF4D4D;
+  text-align: center;
+  margin: 1rem 0;
+  padding: 1rem;
+  background: rgba(255, 77, 77, 0.1);
+  border-radius: 8px;
+}
+
+.analysis-result {
+  background: #242424;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+}
+
+.analysis-section {
+  margin-bottom: 2rem;
+}
+
+.analysis-section h3 {
+  color: #fff;
+  font-size: 18px;
+  margin-bottom: 1rem;
+}
+
+.analysis-section p {
+  color: #ccc;
+  line-height: 1.6;
+}
+
+.analysis-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.metric {
+  background: #1a1a1a;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.metric h4 {
+  color: #fff;
+  font-size: 16px;
+  margin-bottom: 0.5rem;
+}
+
+.confidence-bar {
+  background: #333;
+  height: 8px;
+  border-radius: 4px;
+  position: relative;
+  margin-top: 0.5rem;
+}
+
+.confidence-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #7F5AF0, #2CB67D);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.confidence-bar span {
+  position: absolute;
+  right: 0;
+  top: -20px;
+  color: #fff;
+  font-size: 14px;
+} 
