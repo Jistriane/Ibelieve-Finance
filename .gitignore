@@ -1,5 +1,57 @@
-node_modules
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Testing
+coverage/
+
+# Production
+build/
+dist/
+
+# Misc
+.DS_Store
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env-dev
+.env-homolog
+.env-prod
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories and files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Circom specific
+target/
+*.ptau
+*.sym
+*.r1cs
+*.wasm
+*.zkey
+*.json
+*.wtns
+*.sol
+
+# Hardhat
+cache/
+artifacts/
+typechain/
+typechain-types/
+
+# Temporary files
+*.log
+*.tmp
 
 # Hardhat files
 /cache
