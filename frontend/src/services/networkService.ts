@@ -156,9 +156,12 @@ export class NetworkService {
     }
 
     try {
-      const [chain, properties, totalIssuance, stakedAmount, holders] = await Promise.all([
+      const [chain, properties] = await Promise.all([
         this.api.rpc.system.chain(),
-        this.api.rpc.system.properties(),
+        this.api.rpc.system.properties()
+      ]);
+
+      const [totalIssuance, stakedAmount, holders] = await Promise.all([
         this.api.query.balances.totalIssuance(),
         this.api.query.staking.total(),
         this.api.query.system.accountCount()

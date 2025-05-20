@@ -1,4 +1,4 @@
-import { web3Enable, web3Accounts, web3FromSource } from '@polkadot/extension-dapp';
+import { web3Enable, web3Accounts } from '@polkadot/extension-dapp';
 
 // Adiciona a declaração do tipo para a SubWallet
 declare global {
