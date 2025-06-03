@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    environment:
+      - NODE_ENV=production
+      - REACT_APP_API_URL=https://api.example.com
+      - REACT_APP_OLLAMA_URL=http://ollama:11434
+      - REACT_APP_BLOCKCHAIN_NETWORK=mainnet
+      - REACT_APP_CONTRACT_ADDRESS=0x1234567890123456789012345678901234567890
+      - REACT_APP_INFURA_KEY=${INFURA_KEY}
+      - REACT_APP_ALCHEMY_KEY=${ALCHEMY_KEY}
+      - REACT_APP_POLKADOT_WS_URL=wss://rpc.polkadot.io
+    networks:
+      - app-network
+    depends_on:
+      - ollama
+
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  ollama_data: 

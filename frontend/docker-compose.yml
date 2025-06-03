@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+      - ollama
+    networks:
+      - ibelieve-network
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - ibelieve-network
+
+  backend:
+    image: node:18-alpine
+    working_dir: /app
+    volumes:
+      - ../backend:/app
+    command: >
+      sh -c "yarn install &&
+             yarn start"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - OLLAMA_API_URL=http://ollama:11434
+      - LOG_API_URL=http://log-service:3002
+      - METRICS_API_URL=http://metrics-service:3003
+    ports:
+      - "3001:3001"
+    networks:
+      - ibelieve-network
+
+networks:
+  ibelieve-network:
+    driver: bridge
+
+volumes:
+  ollama_data: 

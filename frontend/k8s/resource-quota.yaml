@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: ibelieve-dev-quota
+  namespace: ibelieve-dev
+  labels:
+    app: ibelieve
+    env: dev
+spec:
+  hard:
+    requests.cpu: "4"
+    requests.memory: 8Gi
+    limits.cpu: "8"
+    limits.memory: 16Gi
+    requests.storage: 100Gi
+    persistentvolumeclaims: "10"
+    pods: "20"
+    services: "10"
+    services.loadbalancers: "2"
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: ibelieve-homolog-quota
+  namespace: ibelieve-homolog
+  labels:
+    app: ibelieve
+    env: homolog
+spec:
+  hard:
+    requests.cpu: "8"
+    requests.memory: 16Gi
+    limits.cpu: "16"
+    limits.memory: 32Gi
+    requests.storage: 200Gi
+    persistentvolumeclaims: "20"
+    pods: "40"
+    services: "20"
+    services.loadbalancers: "4"
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: ibelieve-prod-quota
+  namespace: ibelieve-prod
+  labels:
+    app: ibelieve
+    env: prod
+spec:
+  hard:
+    requests.cpu: "16"
+    requests.memory: 32Gi
+    limits.cpu: "32"
+    limits.memory: 64Gi
+    requests.storage: 500Gi
+    persistentvolumeclaims: "50"
+    pods: "100"
+    services: "50"
+    services.loadbalancers: "10" 

@@ -1,0 +1,24 @@
+[package]
+name = "blockchain-service"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio.workspace = true
+sqlx.workspace = true
+uuid.workspace = true
+chrono.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+log.workspace = true
+env_logger.workspace = true
+actix-web.workspace = true
+ethers.workspace = true
+mockall.workspace = true
+utoipa.workspace = true
+utoipa-swagger-ui.workspace = true
+common = { path = "../common" }
+
+[dev-dependencies]
+actix-rt = { workspace = true }
+test-log = { workspace = true } 

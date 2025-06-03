@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ibelieve-dev
+  labels:
+    app: ibelieve
+    env: dev
+    name: ibelieve-dev
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ibelieve-homolog
+  labels:
+    app: ibelieve
+    env: homolog
+    name: ibelieve-homolog
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ibelieve-prod
+  labels:
+    app: ibelieve
+    env: prod
+    name: ibelieve-prod
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: monitoring
+  labels:
+    app: ibelieve
+    component: monitoring
+    name: monitoring
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: velero
+  labels:
+    app: ibelieve
+    component: velero
+    name: velero 

@@ -1,0 +1,29 @@
+groups:
+  - name: zkproof_alerts
+    rules:
+      - alert: ZKProofGenerationFailure
+        expr: rate(zkproof_generation_failures_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Alta taxa de falhas na geração de provas"
+          description: "Taxa de falha na geração de provas está acima de 10% nos últimos 5 minutos"
+
+      - alert: ZKProofGenerationLatency
+        expr: histogram_quantile(0.95, rate(zkproof_generation_duration_seconds_bucket[5m])) > 30
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Latência alta na geração de provas"
+          description: "95% das gerações de prova estão demorando mais de 30 segundos"
+
+      - alert: ZKProofVerificationFailure
+        expr: rate(zkproof_verification_failures_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Alta taxa de falhas na verificação de provas"
+          description: "Taxa de falha na verificação de provas está acima de 5% nos últimos 5 minutos" 

@@ -1,0 +1,153 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluent-bit-config
+  namespace: monitoring
+  labels:
+    app: ibelieve
+    component: fluent-bit
+data:
+  fluent-bit.conf: |
+    [SERVICE]
+        Flush        5
+        Daemon       Off
+        Log_Level    info
+        HTTP_Server  On
+        HTTP_Listen  0.0.0.0
+        HTTP_Port    2020
+
+    [INPUT]
+        Name        tail
+        Path        /var/log/containers/*.log
+        Parser      docker
+        Tag         kube.*
+        Mem_Buf_Limit  5MB
+        Skip_Long_Lines On
+
+    [FILTER]
+        Name        kubernetes
+        Match       kube.*
+        Merge_Log   On
+        Keep_Log    Off
+        K8S-Logging.Parser    On
+        K8S-Logging.Exclude   On
+
+    [FILTER]
+        Name        modify
+        Match       kube.*
+        Copy        app app.original
+        Copy        component component.original
+        Copy        env env.original
+
+    [OUTPUT]
+        Name        loki
+        Match       kube.*
+        Host        ibelieve-loki
+        Port        3100
+        Labels      app, component, env
+        Remove_Keys kubernetes,stream
+        Label_Keys  container_name,pod_name,namespace
+        Auto_Kubernetes_Labels  on
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluent-bit
+  namespace: monitoring
+  labels:
+    app: ibelieve
+    component: fluent-bit
+spec:
+  selector:
+    matchLabels:
+      app: ibelieve
+      component: fluent-bit
+  template:
+    metadata:
+      labels:
+        app: ibelieve
+        component: fluent-bit
+    spec:
+      serviceAccountName: fluent-bit
+      containers:
+      - name: fluent-bit
+        image: fluent/fluent-bit:latest
+        volumeMounts:
+        - name: varlog
+          mountPath: /var/log
+        - name: varlibdockercontainers
+          mountPath: /var/lib/docker/containers
+          readOnly: true
+        - name: fluent-bit-config
+          mountPath: /fluent-bit/etc/
+        resources:
+          requests:
+            memory: 50Mi
+            cpu: 100m
+          limits:
+            memory: 100Mi
+            cpu: 200m
+        ports:
+        - containerPort: 2020
+          name: http
+        livenessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: http
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: http
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+      volumes:
+      - name: varlog
+        hostPath:
+          path: /var/log
+      - name: varlibdockercontainers
+        hostPath:
+          path: /var/lib/docker/containers
+      - name: fluent-bit-config
+        configMap:
+          name: fluent-bit-config
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: fluent-bit
+  namespace: monitoring
+  labels:
+    app: ibelieve
+    component: fluent-bit
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: fluent-bit
+  labels:
+    app: ibelieve
+    component: fluent-bit
+rules:
+- apiGroups: [""]
+  resources:
+  - namespaces
+  - pods
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: fluent-bit
+  labels:
+    app: ibelieve
+    component: fluent-bit
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: fluent-bit
+subjects:
+- kind: ServiceAccount
+  name: fluent-bit
+  namespace: monitoring 

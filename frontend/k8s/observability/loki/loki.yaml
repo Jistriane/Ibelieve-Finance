@@ -1,0 +1,93 @@
+apiVersion: loki.grafana.com/v1
+kind: LokiStack
+metadata:
+  name: ibelieve-loki
+  namespace: monitoring
+  labels:
+    app: ibelieve
+    component: loki
+spec:
+  size: 1x.small
+  storage:
+    schemas:
+    - version: v12
+      effectiveDate: "2023-01-01"
+    secret:
+      type: s3
+      name: loki-s3-secret
+  retention:
+    time: 360h  # 15 dias
+  limits:
+    ingestionRate: 10MB
+    ingestionBurstSize: 20MB
+    maxQueryLength: 721h
+    maxQueryLookback: 721h
+    maxQueryParallelism: 32
+    cardinalityLimit: 100000
+    maxStreamsPerUser: 0
+    maxGlobalStreamsPerUser: 0
+    ingestionTenantId: ""
+    perStreamRateLimit: 3MB
+    perStreamRateLimitBurst: 5MB
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: loki-runtime-config
+  namespace: monitoring
+  labels:
+    app: ibelieve
+    component: loki
+data:
+  loki.yaml: |
+    auth_enabled: false
+    ingester:
+      lifecycler:
+        address: 127.0.0.1
+        ring:
+          kvstore:
+            store: inmemory
+          replication_factor: 1
+        final_sleep: 0s
+      chunk_idle_period: 5m
+      chunk_retain_period: 30s
+    schema_config:
+      configs:
+        - from: 2023-01-01
+          store: boltdb-shipper
+          object_store: s3
+          schema: v12
+          index:
+            prefix: loki_index_
+            period: 24h
+    storage_config:
+      boltdb_shipper:
+        active_index_directory: /tmp/loki/boltdb-shipper-active
+        cache_location: /tmp/loki/boltdb-shipper-cache
+        cache_ttl: 24h
+        shared_store: s3
+      aws:
+        s3: s3://ibelieve-logs
+        region: us-east-1
+    limits_config:
+      enforce_metric_name: false
+      reject_old_samples: true
+      reject_old_samples_max_age: 168h
+    chunk_store_config:
+      max_look_back_period: 0s
+    table_manager:
+      retention_deletes_enabled: true
+      retention_period: 360h
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: loki-s3-secret
+  namespace: monitoring
+  labels:
+    app: ibelieve
+    component: loki
+type: Opaque
+data:
+  access_key_id: <base64-encoded-access-key>
+  secret_access_key: <base64-encoded-secret-key> 

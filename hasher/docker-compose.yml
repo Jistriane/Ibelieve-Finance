@@ -1,0 +1,138 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ibelieve_finance
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  ai_service:
+    build:
+      context: .
+      dockerfile: services/ai/Dockerfile
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/ibelieve_finance
+      OLLAMA_API_URL: http://ollama:11434
+      OLLAMA_MODEL: mistral
+      AI_SERVICE_PORT: 3001
+      JWT_SECRET: ${JWT_SECRET:-default_secret_key}
+      RUST_LOG: info
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  blockchain_service:
+    build:
+      context: .
+      dockerfile: services/blockchain/Dockerfile
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/ibelieve_finance
+      BLOCKCHAIN_SERVICE_PORT: 3002
+      ETHEREUM_RPC_URL: ${ETHEREUM_RPC_URL}
+      ETHEREUM_CHAIN_ID: ${ETHEREUM_CHAIN_ID}
+      JWT_SECRET: ${JWT_SECRET:-default_secret_key}
+      RUST_LOG: info
+    ports:
+      - "3002:3002"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  zkp_service:
+    build:
+      context: .
+      dockerfile: services/zkp/Dockerfile
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/ibelieve_finance
+      ZKP_SERVICE_PORT: 3003
+      JWT_SECRET: ${JWT_SECRET:-default_secret_key}
+      RUST_LOG: info
+    ports:
+      - "3003:3003"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_data:
+  ollama_data:
+  prometheus_data:
+  grafana_data: 

@@ -1,0 +1,33 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'ai_service'
+    static_configs:
+      - targets: ['ai_service:3001']
+    metrics_path: '/metrics'
+
+  - job_name: 'blockchain_service'
+    static_configs:
+      - targets: ['blockchain_service:3002']
+    metrics_path: '/metrics'
+
+  - job_name: 'zkp_service'
+    static_configs:
+      - targets: ['zkp_service:3003']
+    metrics_path: '/metrics'
+
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml" 

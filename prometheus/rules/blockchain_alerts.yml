@@ -1,0 +1,38 @@
+groups:
+  - name: blockchain_alerts
+    rules:
+      - alert: BlockchainTransactionFailure
+        expr: rate(blockchain_transaction_failures_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Alta taxa de falhas em transações blockchain"
+          description: "Taxa de falha em transações blockchain está acima de 10% nos últimos 5 minutos"
+
+      - alert: BlockchainTransactionLatency
+        expr: histogram_quantile(0.95, rate(blockchain_transaction_duration_seconds_bucket[5m])) > 60
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Latência alta em transações blockchain"
+          description: "95% das transações blockchain estão demorando mais de 60 segundos"
+
+      - alert: BlockchainGasPriceHigh
+        expr: ethereum_gas_price > 100000000000
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Preço do gas muito alto"
+          description: "O preço do gas está acima de 100 gwei por mais de 15 minutos"
+
+      - alert: BlockchainNodeSync
+        expr: ethereum_sync_status != 1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Nó Ethereum fora de sincronia"
+          description: "O nó Ethereum não está sincronizado com a rede" 

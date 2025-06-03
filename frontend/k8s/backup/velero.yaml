@@ -1,0 +1,79 @@
+apiVersion: velero.io/v1
+kind: BackupStorageLocation
+metadata:
+  name: default
+  namespace: velero
+  labels:
+    app: ibelieve
+    component: velero
+spec:
+  provider: aws
+  objectStorage:
+    bucket: ibelieve-backups
+  config:
+    region: us-east-1
+---
+apiVersion: velero.io/v1
+kind: VolumeSnapshotLocation
+metadata:
+  name: default
+  namespace: velero
+  labels:
+    app: ibelieve
+    component: velero
+spec:
+  provider: aws
+  config:
+    region: us-east-1
+---
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: daily-backup
+  namespace: velero
+  labels:
+    app: ibelieve
+    component: velero
+spec:
+  schedule: "0 1 * * *"  # 1 AM daily
+  template:
+    hooks: {}
+    includedNamespaces:
+    - ibelieve-dev
+    - ibelieve-homolog
+    - ibelieve-prod
+    ttl: 720h  # 30 days
+    storageLocation: default
+    volumeSnapshotLocations:
+    - default
+---
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: weekly-backup
+  namespace: velero
+  labels:
+    app: ibelieve
+    component: velero
+spec:
+  schedule: "0 1 * * 0"  # 1 AM every Sunday
+  template:
+    hooks: {}
+    includedNamespaces:
+    - ibelieve-prod
+    ttl: 2160h  # 90 days
+    storageLocation: default
+    volumeSnapshotLocations:
+    - default
+---
+apiVersion: velero.io/v1
+kind: DeleteBackupRequest
+metadata:
+  name: cleanup-old-backups
+  namespace: velero
+  labels:
+    app: ibelieve
+    component: velero
+spec:
+  schedule: "0 2 * * *"  # 2 AM daily
+  retention: 30d 

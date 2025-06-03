@@ -1,0 +1,77 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Alertmanager
+metadata:
+  name: ibelieve-alertmanager
+  namespace: monitoring
+  labels:
+    app: ibelieve
+    component: alertmanager
+spec:
+  replicas: 2
+  retention: 120h
+  resources:
+    requests:
+      memory: 200Mi
+      cpu: 100m
+    limits:
+      memory: 400Mi
+      cpu: 200m
+  storage:
+    volumeClaimTemplate:
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 10Gi
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 65534
+  serviceAccountName: alertmanager
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: ibelieve-alerts
+  namespace: monitoring
+  labels:
+    app: ibelieve
+    component: prometheus
+spec:
+  groups:
+  - name: ibelieve.rules
+    rules:
+    - alert: FrontendHighLatency
+      expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le)) > 1
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Alta latência no frontend"
+        description: "O frontend está com latência acima de 1s para 95% das requisições"
+
+    - alert: OllamaHighMemoryUsage
+      expr: container_memory_usage_bytes{container="ollama"} > 6 * 1024 * 1024 * 1024
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Alto uso de memória no Ollama"
+        description: "O Ollama está usando mais de 6GB de memória"
+
+    - alert: FrontendDown
+      expr: up{job="frontend"} == 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Frontend indisponível"
+        description: "O frontend está fora do ar há mais de 1 minuto"
+
+    - alert: OllamaDown
+      expr: up{job="ollama"} == 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Ollama indisponível"
+        description: "O Ollama está fora do ar há mais de 1 minuto" 

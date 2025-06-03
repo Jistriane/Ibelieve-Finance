@@ -1,0 +1,613 @@
+# Hasher - Serviço de Integração com Open Finance
+
+## 📋 Descrição
+Hasher é um serviço de integração com Open Finance que fornece uma API RESTful para gerenciar autenticação, autorização e integração com serviços financeiros.
+
+## 🚀 Tecnologias
+- Node.js
+- TypeScript
+- Express
+- Redis
+- Elasticsearch
+- Prometheus
+- Grafana
+- Docker
+- Docker Compose
+- IA (Gemma Mistral Ollama)
+
+## 🤖 Integração com IA
+
+O sistema utiliza inteligência artificial para fornecer análises avançadas e assistência automatizada através do modelo Gemma 2B, integrado via Ollama.
+
+### Funcionalidades de IA
+
+1. **Assistente Virtual**
+   - Chat interativo para dúvidas sobre finanças
+   - Respostas contextualizadas sobre solvência e crédito
+   - Interface amigável e responsiva
+
+2. **Análise de Risco**
+   - Avaliação automática de perfis financeiros
+   - Pontuação de risco (0-100)
+   - Recomendações personalizadas
+
+3. **Otimização ZKP**
+   - Sugestões de tipos de prova mais eficientes
+   - Análise de eficiência (0-100)
+   - Explicações detalhadas das recomendações
+
+4. **Detecção de Fraudes**
+   - Análise de transações suspeitas
+   - Nível de confiança da detecção
+   - Detalhamento de possíveis fraudes
+
+### Configuração da IA
+
+1. **Requisitos**
+   - Ollama instalado e configurado
+   - Modelo Gemma 2B baixado
+   - Conexão com a API do Ollama
+
+2. **Variáveis de Ambiente**
+   ```env
+   OLLAMA_API_URL=http://localhost:11434
+   MODEL_NAME=gemma:2b
+   ```
+
+3. **Inicialização**
+   ```bash
+   # Verificar se o Ollama está rodando
+   curl http://localhost:11434/api/tags
+
+   # Iniciar o serviço de IA
+   npm run start:ai
+   ```
+
+### Componentes de IA
+
+- `AIAssistant`: Interface principal do chat
+- `FinancialChatbot`: Chat especializado em finanças
+- `AINavigation`: Navegação entre funcionalidades de IA
+- `aiService`: Serviço de integração com a IA
+- `ollamaService`: Gerenciamento da conexão com Ollama
+
+## 📦 Pré-requisitos
+- Docker
+- Docker Compose
+- Node.js 18+
+- npm 8+
+- Ollama (para funcionalidades de IA)
+- Modelo Gemma 2B baixado no Ollama
+- Mínimo 8GB de RAM para execução da IA
+- Conexão estável com a internet para download do modelo
+
+## 🔧 Instalação
+
+1. Clone o repositório:
+```bash
+git clone https://github.com/seu-usuario/hasher.git
+cd hasher
+```
+
+2. Configure as variáveis de ambiente:
+```bash
+cp .env-dev .env
+```
+
+3. Edite o arquivo `.env` com suas configurações.
+
+4. Instale e configure o Ollama (para funcionalidades de IA):
+```bash
+# Instalar Ollama (Linux)
+curl https://ollama.ai/install.sh | sh
+
+# Baixar o modelo Gemma 2B
+ollama pull gemma:2b
+
+# Verificar se o modelo foi baixado corretamente
+ollama list
+```
+
+## 🚀 Execução
+
+### Método 1: Usando o script de inicialização (Recomendado)
+```bash
+# Tornar o script executável
+chmod +x start-server.sh
+
+# Executar o script
+./start-server.sh
+```
+
+### Método 2: Usando Docker Compose diretamente
+```bash
+# Iniciar os serviços
+docker compose up --build -d
+
+# Verificar logs
+docker compose logs -f
+
+# Parar os serviços
+docker compose down
+```
+
+## 🌐 Endpoints Disponíveis
+
+### API (http://localhost:3001)
+- `GET /health` - Verificar status do servidor
+- `GET /metrics` - Métricas do Prometheus
+- `GET /api/*` - Rotas da API
+
+### Grafana (http://localhost:3002)
+- Usuário: admin
+- Senha: ibeleve123
+
+### Prometheus (http://localhost:9090)
+- Métricas e alertas
+
+### Elasticsearch (http://localhost:9200)
+- Usuário: elastic
+- Senha: ibeleve123
+
+### Alertmanager (http://localhost:9093)
+- Gerenciamento de alertas
+
+## 📊 Monitoramento
+
+### Grafana
+- Dashboards pré-configurados para monitoramento
+- Métricas de performance
+- Alertas configuráveis
+
+### Prometheus
+- Coleta de métricas
+- Regras de alerta
+- Histórico de dados
+
+### Elasticsearch
+- Logs centralizados
+- Análise de performance
+- Busca em tempo real
+
+## 🔍 Logs
+
+Os logs são centralizados no Elasticsearch e podem ser visualizados através do Grafana ou diretamente via API do Elasticsearch.
+
+## 🔐 Segurança
+
+- Autenticação JWT
+- Rate limiting
+- CORS configurado
+- Sanitização de inputs
+- Headers de segurança
+
+## 🧪 Testes
+
+```bash
+# Executar testes
+npm test
+
+# Executar testes com coverage
+npm run test:coverage
+
+# Executar testes em modo watch
+npm run test:watch
+```
+
+## 📝 Scripts Disponíveis
+
+- `npm start` - Inicia o servidor em produção
+- `npm run dev` - Inicia o servidor em desenvolvimento
+- `npm run build` - Compila o TypeScript
+- `npm test` - Executa os testes
+- `npm run lint` - Executa o linter
+- `npm run clean` - Limpa o diretório dist
+- `npm run start:ai` - Inicia o serviço de IA
+- `npm run test:ai` - Executa testes específicos da IA
+- `npm run ollama:check` - Verifica status do Ollama
+- `npm run ollama:restart` - Reinicia o serviço Ollama
+
+## 🤝 Contribuindo
+
+1. Faça um fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+## 📄 Licença
+
+Este projeto está sob a licença ISC. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+## 👥 Autores
+
+- Seu Nome - [@seu-usuario](https://github.com/seu-usuario)
+
+## 🙏 Agradecimentos
+
+- Open Finance
+- Comunidade Node.js
+- Comunidade Docker
+
+# Ibelieve Finance - Sistema de Verificação Blockchain
+
+Este é um sistema distribuído para verificação de transações blockchain usando Zero Knowledge Proofs (ZKP).
+
+## Estrutura do Projeto
+
+O sistema é composto por vários microserviços:
+
+- **Blockchain Service** (Porta 8084): Serviço de verificação blockchain
+- **User Service** (Porta 8085): Gerenciamento de usuários
+- **ZKP Service** (Porta 8082): Geração e verificação de provas ZKP
+
+## Requisitos
+
+- Rust (última versão estável)
+- Cargo
+- Docker (opcional, para containerização)
+- Node.js 18+ (para ferramentas de desenvolvimento)
+- npm 8+ (para ferramentas de desenvolvimento)
+
+## Instalação
+
+1. Clone o repositório:
+```bash
+git clone https://github.com/seu-usuario/ibelieve-finance.git
+cd ibelieve-finance
+```
+
+2. Instale as dependências:
+```bash
+cargo build
+```
+
+## Comandos e Funcionalidades
+
+### Comandos de Desenvolvimento
+
+```bash
+# Compilar o projeto
+cargo build
+
+# Executar testes
+cargo test
+
+# Executar testes com coverage
+cargo test -- --nocapture
+
+# Executar testes em modo watch
+cargo watch -x test
+
+# Formatar código
+cargo fmt
+
+# Verificar problemas de código
+cargo clippy
+
+# Limpar build
+cargo clean
+
+# Atualizar dependências
+cargo update
+```
+
+### Comandos NPM
+
+```bash
+# Instalar dependências
+npm install
+
+# Iniciar em modo desenvolvimento
+npm run dev
+
+# Iniciar em modo produção
+npm start
+
+# Executar testes
+npm test
+
+# Executar testes com coverage
+npm run test:coverage
+
+# Executar testes em modo watch
+npm run test:watch
+
+# Executar linter
+npm run lint
+
+# Compilar TypeScript
+npm run build
+
+# Limpar diretório dist
+npm run clean
+```
+
+### Comandos de Serviço
+
+```bash
+# Iniciar Blockchain Service
+cd hasher/services/blockchain
+cargo run
+
+# Iniciar User Service
+cd hasher/services/user
+cargo run
+
+# Iniciar ZKP Service
+cd hasher/services/zkp
+cargo run
+
+# Iniciar todos os serviços (requer Docker)
+docker-compose up -d
+```
+
+### Comandos de Monitoramento
+
+```bash
+# Ver logs do Blockchain Service
+docker logs -f blockchain-service
+
+# Ver logs do User Service
+docker logs -f user-service
+
+# Ver logs do ZKP Service
+docker logs -f zkp-service
+
+# Ver métricas do Prometheus
+curl http://localhost:9090/metrics
+
+# Verificar saúde dos serviços
+curl http://localhost:8084/health  # Blockchain Service
+curl http://localhost:8085/health  # User Service
+curl http://localhost:8082/health  # ZKP Service
+```
+
+### Comandos de Banco de Dados
+
+```bash
+# Executar migrações
+cargo run --bin migrations
+
+# Backup do banco de dados
+pg_dump -U postgres ibelieve > backup.sql
+
+# Restaurar backup
+psql -U postgres ibelieve < backup.sql
+```
+
+### Comandos de Segurança
+
+```bash
+# Gerar chaves de desenvolvimento
+cargo run --bin generate-keys
+
+# Verificar vulnerabilidades
+cargo audit
+
+# Verificar dependências desatualizadas
+cargo outdated
+```
+
+## Executando os Serviços
+
+### Blockchain Service
+
+```bash
+cd hasher/services/blockchain
+cargo run
+```
+
+Endpoints disponíveis:
+- `POST /api/blockchain/verify-assets`: Verifica ativos na blockchain
+- `GET /api/blockchain/verify-transaction/{tx_hash}`: Verifica uma transação específica
+- Swagger UI: http://localhost:8084/swagger-ui/
+
+### User Service
+
+```bash
+cd hasher/services/user
+cargo run
+```
+
+Endpoints disponíveis:
+- `GET /api/users/{user_id}`: Obtém informações de um usuário
+- `POST /api/users`: Cria um novo usuário
+- `PUT /api/users/{user_id}`: Atualiza um usuário existente
+- Swagger UI: http://localhost:8085/swagger-ui/
+
+### ZKP Service
+
+```bash
+cd hasher/services/zkp
+cargo run
+```
+
+Endpoints disponíveis:
+- `POST /api/zkp/generate`: Gera uma nova prova ZKP
+- `POST /api/zkp/verify`: Verifica uma prova ZKP
+- Swagger UI: http://localhost:8082/swagger-ui/
+
+## Exemplos de Uso
+
+### Verificação de Ativos
+
+```bash
+curl -X POST http://localhost:8084/api/blockchain/verify-assets \
+  -H "Content-Type: application/json" \
+  -d '{
+    "verified": true,
+    "timestamp": "2024-03-24T12:00:00Z",
+    "transaction_hash": "0x123..."
+  }'
+```
+
+### Criação de Usuário
+
+```bash
+curl -X POST http://localhost:8085/api/users \
+  -H "Content-Type: application/json" \
+  -d '{
+    "wallet_address": "0x123...",
+    "created_at": "2024-03-24T12:00:00Z",
+    "updated_at": "2024-03-24T12:00:00Z"
+  }'
+```
+
+### Geração de Prova ZKP
+
+```bash
+curl -X POST http://localhost:8082/api/zkp/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "proof": "zkp_proof_here",
+    "public_inputs": ["input1", "input2"],
+    "verification_key": "verification_key_here"
+  }'
+```
+
+## Estrutura de Dados
+
+### BlockchainVerification
+```rust
+{
+    verified: bool,
+    timestamp: DateTime<Utc>,
+    transaction_hash: Option<String>
+}
+```
+
+### User
+```rust
+{
+    id: Uuid,
+    wallet_address: String,
+    created_at: DateTime<Utc>,
+    updated_at: DateTime<Utc>
+}
+```
+
+### ZKPProof
+```rust
+{
+    proof: String,
+    public_inputs: Vec<String>,
+    verification_key: String
+}
+```
+
+## Desenvolvimento
+
+### Adicionando Novas Funcionalidades
+
+1. Crie um novo branch:
+```bash
+git checkout -b feature/nova-funcionalidade
+```
+
+2. Implemente as mudanças
+3. Execute os testes:
+```bash
+cargo test
+```
+
+4. Faça commit das mudanças:
+```bash
+git add .
+git commit -m "feat: adiciona nova funcionalidade"
+```
+
+5. Envie para o repositório:
+```bash
+git push origin feature/nova-funcionalidade
+```
+
+### Convenções de Código
+
+- Use `cargo fmt` para formatar o código
+- Use `cargo clippy` para verificar problemas de código
+- Siga as convenções de nomenclatura do Rust
+- Documente todas as funções públicas
+
+## Segurança
+
+- Todas as APIs são protegidas por CORS
+- Use HTTPS em produção
+- Valide todas as entradas
+- Implemente rate limiting em produção
+- Use variáveis de ambiente para configurações sensíveis
+- Implemente autenticação JWT
+- Mantenha as dependências atualizadas
+
+## Monitoramento e Logs
+
+### Prometheus
+- Métricas de performance
+- Alertas configuráveis
+- Histórico de dados
+
+### Grafana
+- Dashboards personalizados
+- Visualização de métricas
+- Alertas em tempo real
+
+### Elasticsearch
+- Logs centralizados
+- Análise de performance
+- Busca em tempo real
+
+## Contribuição
+
+1. Fork o projeto
+2. Crie sua branch de feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+## Licença
+
+Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
+
+## Contato
+
+Seu Nome - [@seu_twitter](https://twitter.com/seu_twitter)
+
+Link do Projeto: [https://github.com/seu-usuario/ibelieve-finance](https://github.com/seu-usuario/ibelieve-finance)
+
+# Ibelieve-Finance
+
+## Estrutura do Projeto
+- `contracts/`: Contratos inteligentes.
+- `scripts/`: Scripts de deploy e interação com contratos.
+- `test/`: Testes unitários e de integração.
+- `frontend/`: Código da interface do usuário.
+- `backend/`: Código do servidor e APIs.
+- `docs/`: Documentação do projeto.
+
+## Instalação e Configuração
+1. Clone o repositório.
+2. Instale as dependências:
+   ```bash
+   npm install
+   ```
+
+## Execução do Nó Hardhat
+Para iniciar o nó Hardhat local:
+```bash
+npx hardhat node
+```
+
+## Deploy de Contratos
+Para fazer o deploy dos contratos:
+```bash
+npx hardhat run scripts/deploy.js --network localhost
+```
+
+## Testes
+Para executar os testes:
+```bash
+npx hardhat test
+```
+
+## Documentação
+Consulte a pasta `docs/` para documentação detalhada do projeto.

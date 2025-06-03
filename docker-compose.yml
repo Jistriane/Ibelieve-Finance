@@ -1,0 +1,134 @@
+version: '3.8'
+
+services:
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - REACT_APP_API_URL=http://localhost:3001
+      - REACT_APP_OLLAMA_URL=http://ollama:11434
+      - REACT_APP_CHAIN_ID=11155111
+      - REACT_APP_NETWORK=sepolia
+    depends_on:
+      - backend
+      - ollama
+      - redis
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/ibelieve
+    depends_on:
+      - postgres
+      - redis
+
+  # Ollama (IA)
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  # Redis (Cache)
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
+  # PostgreSQL
+  postgres:
+    image: postgres:14-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=ibelieve
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Logging Service
+  logging:
+    image: elasticsearch:7.9.3
+    ports:
+      - "9200:9200"
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+
+  # Metrics Service
+  metrics:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+
+  # Grafana (Visualização de Métricas)
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3004:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - metrics
+
+  # Polkadot Node (para integração com Substrate)
+  polkadot:
+    image: paritytech/polkadot:latest
+    ports:
+      - "9944:9944"
+    command: --ws-external --rpc-external --pruning archive
+
+  # Ganache (Blockchain Local para Desenvolvimento)
+  ganache:
+    image: trufflesuite/ganache:latest
+    ports:
+      - "8545:8545"
+    command: --chain.networkId 11155111 --chain.chainId 11155111
+
+volumes:
+  ollama_data:
+  redis_data:
+  postgres_data:
+  elasticsearch_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  ibelieve-network:
+    driver: bridge 

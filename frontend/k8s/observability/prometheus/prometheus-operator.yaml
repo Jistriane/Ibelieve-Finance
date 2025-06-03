@@ -1,0 +1,74 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  name: ibelieve-prometheus
+  namespace: monitoring
+  labels:
+    app: ibelieve
+    component: prometheus
+spec:
+  replicas: 2
+  retention: 15d
+  resources:
+    requests:
+      memory: 400Mi
+      cpu: 300m
+    limits:
+      memory: 1Gi
+      cpu: 1000m
+  storage:
+    volumeClaimTemplate:
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 50Gi
+  serviceMonitorSelector: {}
+  serviceMonitorNamespaceSelector: {}
+  podMonitorSelector: {}
+  podMonitorNamespaceSelector: {}
+  alerting:
+    alertmanagers:
+    - namespace: monitoring
+      name: ibelieve-alertmanager
+      port: web
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 65534
+  serviceAccountName: prometheus-k8s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ibelieve-frontend
+  namespace: monitoring
+  labels:
+    app: ibelieve
+    component: frontend
+spec:
+  selector:
+    matchLabels:
+      app: ibelieve
+      component: frontend
+  endpoints:
+  - port: metrics
+    interval: 15s
+    path: /metrics
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ibelieve-ollama
+  namespace: monitoring
+  labels:
+    app: ibelieve
+    component: ollama
+spec:
+  selector:
+    matchLabels:
+      app: ibelieve
+      component: ollama
+  endpoints:
+  - port: metrics
+    interval: 15s
+    path: /metrics 

@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - REACT_APP_OLLAMA_API_URL=http://ollama:11434
+      - REACT_APP_LOG_API_URL=http://backend:3001/api/logs
+      - REACT_APP_METRICS_API_URL=http://backend:3001/api/metrics
+    depends_on:
+      - ollama
+      - backend
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
+  backend:
+    image: node:18-alpine
+    working_dir: /app
+    volumes:
+      - ../backend:/app
+    command: sh -c "yarn install && yarn dev"
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - OLLAMA_API_URL=http://ollama:11434
+
+volumes:
+  ollama_data: 

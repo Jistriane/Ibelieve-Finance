@@ -1,0 +1,49 @@
+[package]
+name = "common"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Web Framework
+actix-web = "4.0"
+futures = "0.3"
+
+# Tracing
+opentelemetry = { version = "0.20", features = ["rt-tokio"] }
+opentelemetry-otlp = { version = "0.13", features = ["tonic"] }
+opentelemetry-semantic-conventions = "0.12"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["json", "env-filter"] }
+tracing-opentelemetry = "0.21"
+log = "0.4"
+
+# Async
+tokio = { version = "1.0", features = ["full"] }
+async-trait = "0.1"
+
+# Database
+sqlx = { version = "0.7", features = ["postgres", "runtime-tokio-native-tls"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Error handling
+thiserror = "1.0"
+
+# Metrics
+prometheus = "0.13"
+lazy_static = "1.4"
+
+# HTTP Client
+reqwest = { version = "0.11", features = ["json"] }
+
+# Time
+chrono = { version = "0.4", features = ["serde"] }
+
+# Testing
+mockall = "0.11"
+
+[dev-dependencies]
+tokio-test = "0.4"
+actix-rt = "2.0" 

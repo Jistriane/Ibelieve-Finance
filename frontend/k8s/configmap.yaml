@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  NODE_ENV: "production"
+  REACT_APP_API_URL: "https://api.example.com"
+  REACT_APP_OLLAMA_URL: "http://ollama:11434"
+  REACT_APP_BLOCKCHAIN_NETWORK: "mainnet"
+  REACT_APP_CONTRACT_ADDRESS: "0x1234567890123456789012345678901234567890"
+  REACT_APP_POLKADOT_WS_URL: "wss://rpc.polkadot.io"
+  OLLAMA_HOST: "0.0.0.0"
+  OLLAMA_MODELS: "llama2,mixtral" 
